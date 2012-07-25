@@ -37,5 +37,12 @@ class RootViewController < UIViewController
 
 	def tapped(sender)
 		@player.play unless @player.playing?
+		BubbleWrap::HTTP.get("http://levityisland.com:4567/kaneda!") do |response|
+			if response.status_code == 200
+				App.alert(response.body.to_str) 
+			else
+				App.alert("No response from server :(")
+			end
+		end
 	end
 end
