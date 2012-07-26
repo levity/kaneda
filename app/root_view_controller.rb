@@ -16,27 +16,20 @@ class RootViewController < UIViewController
 			UIViewAutoresizingFlexibleTopMargin | 
 			UIViewAutoresizingFlexibleBottomMargin
 
-		# note the trailing colon in the selector
-		tap = UITapGestureRecognizer.alloc.initWithTarget(self, action:'tapped:')
-		self.view.addGestureRecognizer(tap)
-
 		sound_url = NSURL.alloc.initFileURLWithPath(
 			NSBundle.mainBundle.pathForResource('kaneda', ofType:'wav'))
 		@player = AVAudioPlayer.alloc.initWithContentsOfURL(sound_url, error:nil)
-		@player.instance_eval do # 1 <3 ruby
-			def playing?
-				isPlaying == 1
-			end
-		end
 		@player.prepareToPlay
+
+		self.view.whenTapped { yell }
 	end
 
 	def shouldAutorotateToInterfaceOrientation(orientation)
 		true
 	end
 
-	def tapped(sender)
-		@player.play unless @player.playing?
+	def yell
+		@player.play unless @player.isPlaying == 1
 		BubbleWrap::HTTP.get("http://levityisland.com:4567/kaneda!") do |response|
 			if response.status_code == 200
 				App.alert(response.body.to_str) 
